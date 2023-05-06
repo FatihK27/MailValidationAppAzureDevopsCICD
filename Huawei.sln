@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Huawei.WebUIMailValidate", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Huawei.RabbitMqSubscriberService", "Huawei.FileCreateWorkerService\Huawei.RabbitMqSubscriberService.csproj", "{FA07C411-E1D8-48D7-9A29-4B648C5701FC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6911DCDB-F815-4FA0-9DC7-B5157B178BFA}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

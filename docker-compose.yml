@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+    s_webapp:
+        container_name: c_webui
+        image:  fatih27/mailvalidationui
+        build:
+            context: .
+            dockerfile: Huawei.WebUIMailValidate/Dockerfile
+        volumes:
+            - app_wwwroot:/wwwroot
+        ports:
+            - 8090:8090
+        depends_on:
+            - s_postgresql
+            - s_truemail
+            - s_rabbitmq
+    s_worker:
+        container_name: c_workerservice
+        image:  fatih27/validationworkerservice
+        build:
+            context: .
+            dockerfile: Huawei.FileCreateWorkerService/Dockerfile
+        depends_on:
+            - s_postgresql
+            - s_truemail
+            - s_rabbitmq
+    s_rabbitmq: 
+        image: rabbitmq:3.11.15-management
+        container_name: c_rabbitmq
+        restart: always
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+             RABBITMQ_DEFAULT_USER: root
+             RABBITMQ_DEFAULT_PASS: Huawei@123!!
+        volumes:
+            - rabbitmq:/var/lib/rabbitmq/
+        networks:
+            - publicnet
+    s_truemail:
+        container_name: c_truemail
+        image: truemail/truemail-rack:v0.8.0 # for latest version you can use just truemail/truemail-rack:latest
+        ports:
+            - 9292:9292
+        environment:
+            VERIFIER_EMAIL: test@extrakolay.com
+            ACCESS_TOKENS: your_token
+        tty: true
+        networks:
+            - publicnet
+    s_postgresql:
+        container_name: c_postgres
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_DB: MailValidation
+            POSTGRES_PASSWORD: Huawei@123!!
+            POSTGRES_USER:  root
+            PGDATA: /var/lib/postgresql/data/pgdata
+        ports:
+            - 5432:5432
+    s_postgrespgadmin:
+        container_name: c_pgadmin  
+        image: dpage/pgadmin4:latest
+        restart: always
+        ports:
+            - 8080:80
+        environment:
+            PGADMIN_DEFAULT_EMAIL: fatih.cloud@outlook.com
+            PGADMIN_DEFAULT_PASSWORD: root
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
+networks:
+  internalnet:
+    driver: bridge 
+  publicnet:
+    driver: bridge
+
+volumes:
+    rabbitmq:
+    pgadmin-data:
+    app_wwwroot:
+    

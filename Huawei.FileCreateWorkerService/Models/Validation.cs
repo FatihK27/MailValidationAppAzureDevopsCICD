@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Huawei.RabbitMqSubscriberService.Models;
+﻿namespace Huawei.RabbitMqSubscriberService.Models;
 
 public partial class Validation
 {

@@ -15,6 +15,17 @@
         "ASPNETCORE_DETAILED_ERRORS": "1"
       },
       "dotnetRunMessages": "true"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "useSSL": false,
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "http://+:80"
+      },
+      "httpPort": 51803
     }
   },
   "Huawei.WebUIMailValidate": {
@@ -30,7 +41,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:14812",
+      "applicationUrl": "http://localhost:45555",
       "sslPort": 44321
     }
   }

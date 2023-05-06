@@ -29,7 +29,6 @@ namespace Huawei.WebUIMailValidate.Services
         {
             _connection = _connectionFactory.CreateConnection();
 
-
             if (_channel is { IsOpen: true })
             {
                 return _channel;

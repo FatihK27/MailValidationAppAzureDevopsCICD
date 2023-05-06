@@ -85,32 +85,10 @@ namespace Huawei.WebUIMailValidate.Controllers
             {
                 if (file != null)
                 {
+                    Console.WriteLine("Gelen dosya adı:"+file.Name);
                     if (file is not { Length: > 0 }) return BadRequest();
                     var user = await _userManager.FindByNameAsync(User.Identity.Name);
-
-                    //using (StreamReader csvReader = new StreamReader(file.InputStream))
-                    //{
-                    //    while (!csvReader.EndOfStream)
-                    //    {
-                    //        var line = csvReader.ReadLine();
-                    //        var values = line.Split(';');
-                    //    }
-                    //}
-
-
-
-                    //string path = Path.Combine(this.Environment.WebRootPath, "Uploads");
-                    //if (!Directory.Exists(path))
-                    //{
-                    //    Directory.CreateDirectory(path);
-                    //}
                     Guid batchId = Guid.NewGuid();
-                    //string fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_" + batchId.ToString() + ".csv";
-                    //string filePath = Path.Combine(path, fileName);
-                    //using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                    //{
-                    //    file.CopyTo(stream);
-                    //}
                     using (var reader = new StreamReader(file.OpenReadStream()))
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
@@ -131,8 +109,7 @@ namespace Huawei.WebUIMailValidate.Controllers
             }
             catch (Exception ex)
             {
-
-                //Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.ToString());
             }
 
 

@@ -68,11 +68,7 @@ namespace Huawei.RabbitMqSubscriberService
                     //services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
                     services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(uristring), DispatchConsumersAsync = true });
                     services.AddHostedService<Worker>();
-                });
-
-
-
-
+            });
 
     }
 }

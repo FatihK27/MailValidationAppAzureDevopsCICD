@@ -1,8 +1,6 @@
 ﻿using Huawei.RabbitMqSubscriberService.Models;
 using Huawei.RabbitMqSubscriberService.Services;
 using Huawei.RabbitMqSubscriberService.ValidationModels;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -110,8 +108,8 @@ namespace Huawei.RabbitMqSubscriberService
                 using (var http = new HttpClient(clientHandler))
                 {
                     //var endpoint = "http://190.92.217.218:9292?email="+mailAddress;
-                    var endpoint = _configuration.GetValue<string>("MailValidationService:ServiceUrl") +"?email=" + mailAddress;
-                    http.DefaultRequestHeaders.Add("Authorization", _configuration.GetValue<string>("MailValidationService:ValidationToken"));
+                    var endpoint = _configuration.GetValue<string>("TrueMail:ServiceUrl") +"?email=" + mailAddress;
+                    http.DefaultRequestHeaders.Add("Authorization", _configuration.GetValue<string>("TrueMail:ValidationToken"));
                     var result = http.GetAsync(endpoint).Result;
                     var json = result.Content.ReadAsStringAsync().Result;
                     response = JsonConvert.DeserializeObject<Root>(json);

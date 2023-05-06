@@ -31,9 +31,8 @@ namespace Huawei.WebUIMailValidate.Services
                 var clientHandler = new HttpClientHandler();
                 using (var http = new HttpClient(clientHandler))
                 {
-                    //var endpoint = "http://190.92.217.218:9292?email="+mailAddress;
-                    var endpoint = _configuration.GetValue<string>("MailValidationService:ServiceUrl") + "?email=" + _mailAddress;
-                    http.DefaultRequestHeaders.Add("Authorization", _configuration.GetValue<string>("MailValidationService:ValidationToken"));
+                    var endpoint = _configuration.GetValue<string>("TrueMail:ServiceUrl") + "?email=" + _mailAddress;
+                    http.DefaultRequestHeaders.Add("Authorization", _configuration.GetValue<string>("TrueMail:ValidationToken"));
                     var result = http.GetAsync(endpoint).Result;
                     var json = result.Content.ReadAsStringAsync().Result;
                     vresult = JsonConvert.DeserializeObject<Root>(json);
