@@ -29,25 +29,31 @@ namespace Huawei.WebUIMailValidate.Services
         {
             _connection = _connectionFactory.CreateConnection();
 
-            if (_channel is { IsOpen: true })
+            try
             {
+                if (_channel is { IsOpen: true })
+                {
+                    return _channel;
+                }
+
+                _channel = _connection.CreateModel();
+
+                _channel.ExchangeDeclare(ExchangeName, type: "direct", true, false);
+
+                _channel.QueueDeclare(QueueName, true, false, false, null);
+
+                _channel.QueueBind(exchange: ExchangeName, queue: QueueName, routingKey: RoutingKey);
+
+                _logger.LogInformation("RabbitMQ ile bağlantı kuruldu...");
+
                 return _channel;
             }
-
-            _channel = _connection.CreateModel();
-
-            _channel.ExchangeDeclare(ExchangeName, type: "direct", true, false);
-
-            _channel.QueueDeclare(QueueName, true, false, false, null);
-
-
-            _channel.QueueBind(exchange: ExchangeName, queue: QueueName, routingKey: RoutingKey);
-
-            _logger.LogInformation("RabbitMQ ile bağlantı kuruldu...");
-
-
-            return _channel;
-
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+            
         }
 
         public void Dispose()

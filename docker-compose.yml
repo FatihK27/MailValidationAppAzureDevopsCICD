@@ -7,8 +7,8 @@ services:
         build:
             context: .
             dockerfile: Huawei.WebUIMailValidate/Dockerfile
-        volumes:
-            - app_wwwroot:/wwwroot
+            no_cache: true
+            pull: true
         ports:
             - 8090:8090
         depends_on:
@@ -81,5 +81,4 @@ networks:
 volumes:
     rabbitmq:
     pgadmin-data:
-    app_wwwroot:
     

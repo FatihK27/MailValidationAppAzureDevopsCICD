@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +19,43 @@ namespace Huawei.WebUIMailValidate
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            using (var scope = host.Services.CreateScope())
+            Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+
+            try
             {
-                //UseUrls("http://localhost:5003", "https://localhost:5004";
-                var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-                appDbContext.Database.Migrate();
-                if (!appDbContext.Users.Any())
+                Log.Information("Starting web application");
+                var host = CreateHostBuilder(args).Build();
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                using (var scope = host.Services.CreateScope())
                 {
-                    userManager.CreateAsync(new User() { UserName = "deneme", Email = "deneme@outlook.com" }, "Password12*").Wait();
-                    userManager.CreateAsync(new User() { UserName = "deneme2", Email = "deneme2@outlook.com" }, "Password12*").Wait();
+                    //UseUrls("http://localhost:5003", "https://localhost:5004";
+                    var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    appDbContext.Database.Migrate();
+                    if (!appDbContext.Users.Any())
+                    {
+                        userManager.CreateAsync(new User() { UserName = "deneme", Email = "deneme@outlook.com" }, "123").Wait();
+                        userManager.CreateAsync(new User() { UserName = "deneme2", Email = "deneme2@outlook.com" }, "Password12*").Wait();
+                    }
                 }
+                host.Run();
             }
-            host.Run();
+            catch (Exception ex)
+            {
+
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally 
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

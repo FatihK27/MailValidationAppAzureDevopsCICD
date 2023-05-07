@@ -1,16 +1,20 @@
 using Huawei.WebUIMailValidate.Models;
 using Huawei.WebUIMailValidate.Services;
 using Huawei.WebUIMailValidate.SharedModels;
+using Huawei.WebUIMailValidate.StreamHelpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using System;
+using System.IO;
 using System.Net;
 
 namespace Huawei.WebUIMailValidate
@@ -39,7 +43,7 @@ namespace Huawei.WebUIMailValidate
 
             //services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
             services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(uristring), DispatchConsumersAsync = true });
-
+            services.AddTransient<IBufferedFileUploadService, BufferedFileUploadLocalService>();
             services.AddSingleton<RabbitMQPublisher>();
             services.AddSingleton<RabbitMQClientService>();
             services.AddDbContext<AppDbContext>(options =>
@@ -75,9 +79,11 @@ namespace Huawei.WebUIMailValidate
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            
+            
+            
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
