@@ -7,9 +7,9 @@ namespace Huawei.RabbitMqSubscriberService.Services
         private readonly ConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _channel;
-        //public static string ExchangeName = "MailValidationDirectExchange";
-        //public static string RoutingKey = "MailValidation";
         public static string QueueName = "MailValidationQueue";
+        public static string ExchangeName = "MailValidationDirectExchange";
+        public static string RoutingKey = "MailValidation";
 
         private readonly ILogger<RabbitMQClientService> _logger;
 
@@ -17,19 +17,34 @@ namespace Huawei.RabbitMqSubscriberService.Services
         {
             _connectionFactory = connectionFactory;
             _logger = logger;
-
         }
 
         public IModel Connect()
         {
-            _connection = _connectionFactory.CreateConnection();
-            if (_channel is { IsOpen: true })
+
+            try
             {
+                _connection = _connectionFactory.CreateConnection();
+                if (_channel is { IsOpen: true })
+                {
+                    return _channel;
+                }
+
+                _channel = _connection.CreateModel();
+                _channel.ExchangeDeclare(ExchangeName, type: "direct", true, false);
+
+                _channel.QueueDeclare(QueueName, true, false, false, null);
+
+                _channel.QueueBind(exchange: ExchangeName, queue: QueueName, routingKey: RoutingKey);
+
+                _logger.LogInformation("RabbitMQ ile bağlantı kuruldu...");
                 return _channel;
             }
-            _channel = _connection.CreateModel();
-            _logger.LogInformation("RabbitMQ ile bağlantı kuruldu...");
-            return _channel;
+            catch (Exception ex)
+            {
+                _logger.LogError("Gerçekleşen Hata:{0}", ex.ToString());
+                throw;
+            }
         }
 
         public void Dispose()

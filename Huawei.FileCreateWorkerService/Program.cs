@@ -3,6 +3,8 @@ using Huawei.RabbitMqSubscriberService.Services;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using System.Net;
 
 namespace Huawei.RabbitMqSubscriberService
@@ -14,6 +16,13 @@ namespace Huawei.RabbitMqSubscriberService
         {
             try
             {
+                Log.Logger = new LoggerConfiguration()
+                            .MinimumLevel.Debug()
+                            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                            .Enrich.FromLogContext()
+                            .WriteTo.Console()
+                            .CreateLogger();
+
                 CreateHostBuilder(args).Build().Run();
 
                 Log.Information("Stopped cleanly");
@@ -32,6 +41,7 @@ namespace Huawei.RabbitMqSubscriberService
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+            .UseSerilog()
             .UseSystemd()
             .ConfigureAppConfiguration(
                 (hostContext, config) =>
@@ -51,6 +61,8 @@ namespace Huawei.RabbitMqSubscriberService
                 loggingBuilder.AddSerilog(logger, dispose: true);
             })
             .ConfigureServices((hostContext, services) =>
+            {
+                try
                 {
                     IConfiguration Configuration = hostContext.Configuration;
                     services.AddDbContext<MailValidationContext>(options =>
@@ -65,9 +77,15 @@ namespace Huawei.RabbitMqSubscriberService
                     int port = 5672;
                     string uristring = $"amqp://{username}:{encodedPassword}@{hostname}:{port}/";
 
-                    //services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
                     services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(uristring), DispatchConsumersAsync = true });
                     services.AddHostedService<Worker>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Final hata:{0}:", ex.ToString());
+                    throw;
+                }
+
             });
 
     }
