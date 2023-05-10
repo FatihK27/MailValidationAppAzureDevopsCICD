@@ -85,7 +85,7 @@ services:
         ports:
             - "5050:80"
         environment:
-            PGADMIN_DEFAULT_EMAIL: fatih.cloud@outlook.com
+            PGADMIN_DEFAULT_EMAIL: youremail@outlook.com
             PGADMIN_DEFAULT_PASSWORD: root
         volumes:
             - pgadmin-data:/var/lib/pgadmin
