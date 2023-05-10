@@ -17,7 +17,7 @@ services:
             - s_rabbitmq
     s_worker:
         container_name: c_workerservice
-        image:  fatih27/validationworkerservice
+        image:  {yournamespace}/{yourimagename}
         build:
             context: .
             dockerfile: Huawei.FileCreateWorkerService/Dockerfile
@@ -58,7 +58,7 @@ services:
             TZ: Europe/Istanbul
         tty: true
         healthcheck:
-            test: ["CMD", "curl", "-i", "http://host.docker.internal:9292/healthcheck"]
+            test: ["CMD", "curl", "-i", "http://host.docker.internal:9292/healthcheck"] #Change by your infras
             interval: 10s
             timeout: 10s
             retries: 3
@@ -70,7 +70,7 @@ services:
         restart: always
         environment:
             POSTGRES_DB: MailValidation
-            POSTGRES_PASSWORD: Huawei@123!!
+            POSTGRES_PASSWORD: {YourPostgresPass}
             POSTGRES_USER:  root
             PGDATA: /var/lib/postgresql/data/pgdata
             TZ: Europe/Istanbul
