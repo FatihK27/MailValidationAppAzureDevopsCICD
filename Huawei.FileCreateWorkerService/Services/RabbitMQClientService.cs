@@ -7,8 +7,6 @@ namespace Huawei.RabbitMqSubscriberService.Services
         private readonly ConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _channel;
-        //public static string ExchangeName = "MailValidationDirectExchange";
-        //public static string RoutingKey = "MailValidation";
         public static string QueueName = "MailValidationQueue";
         public static string ExchangeName = "MailValidationDirectExchange";
         public static string RoutingKey = "MailValidation";

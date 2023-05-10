@@ -129,8 +129,7 @@ namespace Huawei.RabbitMqSubscriberService
                 var clientHandler = new HttpClientHandler();
                 using (var http = new HttpClient(clientHandler))
                 {
-                    //var endpoint = "http://190.92.217.218:9292?email="+mailAddress;
-                    var endpoint = _configuration.GetValue<string>("TrueMail:ServiceUrl") +"?email=" + mailAddress;
+                    var endpoint = _configuration.GetValue<string>("TrueMail:ServiceUrl") + "?email=" + mailAddress;
                     http.DefaultRequestHeaders.Add("Authorization", _configuration.GetValue<string>("TrueMail:ValidationToken"));
                     var result = http.GetAsync(endpoint).Result;
                     var json = result.Content.ReadAsStringAsync().Result;
@@ -140,7 +139,7 @@ namespace Huawei.RabbitMqSubscriberService
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                
+
             }
             return response;
         }

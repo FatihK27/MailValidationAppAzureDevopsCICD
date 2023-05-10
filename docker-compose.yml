@@ -22,9 +22,12 @@ services:
             context: .
             dockerfile: Huawei.FileCreateWorkerService/Dockerfile
         depends_on:
-            - s_postgresql
-            - s_truemail
-            - s_rabbitmq
+            s_rabbitmq:
+                condition: service_healthy           
+            s_postgresql:
+                condition: service_healthy
+            s_truemail:
+                condition: service_healthy
     s_rabbitmq: 
         image: rabbitmq:3.11.15-management
         container_name: c_rabbitmq
@@ -34,11 +37,15 @@ services:
             - 15672:15672
         environment:
              RABBITMQ_DEFAULT_USER: root
-             RABBITMQ_DEFAULT_PASS: Huawei@123!!
+             RABBITMQ_DEFAULT_PASS: root
         volumes:
             - rabbitmq:/var/lib/rabbitmq/
-        networks:
-            - publicnet
+        healthcheck:
+            test: ["CMD-SHELL", "rabbitmq-diagnostics check_running 2>&1 | grep running || exit 1"]
+            interval: 15s
+            timeout: 15s
+            retries: 3
+            start_period: 20s
     s_truemail:
         container_name: c_truemail
         image: truemail/truemail-rack:v0.8.0 # for latest version you can use just truemail/truemail-rack:latest
@@ -48,8 +55,13 @@ services:
             VERIFIER_EMAIL: test@extrakolay.com
             ACCESS_TOKENS: your_token
         tty: true
-        networks:
-            - publicnet
+        healthcheck:
+            test: ["CMD", "curl", "-i", "http://host.docker.internal:9292/healthcheck"]
+            interval: 10s
+            timeout: 10s
+            retries: 3
+            start_period: 15s
+        restart: on-failure
     s_postgresql:
         container_name: c_postgres
         image: postgres
@@ -60,7 +72,12 @@ services:
             POSTGRES_USER:  root
             PGDATA: /var/lib/postgresql/data/pgdata
         ports:
-            - 5432:5432
+            - 5432:5432 
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready"]
+          interval: 10s
+          timeout: 5s
+          retries: 3        
     s_postgrespgadmin:
         container_name: c_pgadmin  
         image: dpage/pgadmin4:latest
@@ -72,11 +89,6 @@ services:
             PGADMIN_DEFAULT_PASSWORD: root
         volumes:
             - pgadmin-data:/var/lib/pgadmin
-networks:
-  internalnet:
-    driver: bridge 
-  publicnet:
-    driver: bridge
 
 volumes:
     rabbitmq:
