@@ -3,7 +3,7 @@ version: '3.8'
 services:
     s_webapp:
         container_name: c_webui
-        image:  fatih27/mailvalidationui
+        image:  {yournamespace}/{yourimagename}
         build:
             context: .
             dockerfile: Huawei.WebUIMailValidate/Dockerfile
