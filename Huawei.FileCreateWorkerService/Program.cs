@@ -3,6 +3,8 @@ using Huawei.RabbitMqSubscriberService.Services;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using System.Net;
 
 namespace Huawei.RabbitMqSubscriberService
@@ -14,6 +16,13 @@ namespace Huawei.RabbitMqSubscriberService
         {
             try
             {
+                Log.Logger = new LoggerConfiguration()
+                            .MinimumLevel.Debug()
+                            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                            .Enrich.FromLogContext()
+                            .WriteTo.Console()
+                            .CreateLogger();
+
                 CreateHostBuilder(args).Build().Run();
 
                 Log.Information("Stopped cleanly");
@@ -32,6 +41,7 @@ namespace Huawei.RabbitMqSubscriberService
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+            .UseSerilog()
             .UseSystemd()
             .ConfigureAppConfiguration(
                 (hostContext, config) =>
@@ -51,23 +61,32 @@ namespace Huawei.RabbitMqSubscriberService
                 loggingBuilder.AddSerilog(logger, dispose: true);
             })
             .ConfigureServices((hostContext, services) =>
-                {
-                    IConfiguration Configuration = hostContext.Configuration;
-                    services.AddDbContext<MailValidationContext>(options =>
+            {
+                    try
                     {
-                        options.UseNpgsql(Configuration.GetConnectionString("Postgres")).EnableSensitiveDataLogging();
-                    });
-                    services.AddSingleton<RabbitMQClientService>();
-                    string password = hostContext.Configuration.GetValue<string>("RabbitMq:pass");
-                    string encodedPassword = WebUtility.UrlEncode(password);
-                    string hostname = hostContext.Configuration.GetValue<string>("RabbitMq:ServiceUrl");
-                    string username = hostContext.Configuration.GetValue<string>("RabbitMq:user");
-                    int port = 5672;
-                    string uristring = $"amqp://{username}:{encodedPassword}@{hostname}:{port}/";
+                        IConfiguration Configuration = hostContext.Configuration;
+                        services.AddDbContext<MailValidationContext>(options =>
+                        {
+                            options.UseNpgsql(Configuration.GetConnectionString("Postgres")).EnableSensitiveDataLogging();
+                        });
+                        services.AddSingleton<RabbitMQClientService>();
+                        string password = hostContext.Configuration.GetValue<string>("RabbitMq:pass");
+                        string encodedPassword = WebUtility.UrlEncode(password);
+                        string hostname = hostContext.Configuration.GetValue<string>("RabbitMq:ServiceUrl");
+                        string username = hostContext.Configuration.GetValue<string>("RabbitMq:user");
+                        int port = 5672;
+                        string uristring = $"amqp://{username}:{encodedPassword}@{hostname}:{port}/";
 
-                    //services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
-                    services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(uristring), DispatchConsumersAsync = true });
-                    services.AddHostedService<Worker>();
+                        //services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
+                        services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(uristring), DispatchConsumersAsync = true });
+                        services.AddHostedService<Worker>();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Final hata:{0}:",ex.ToString());
+                        throw;
+                    }
+
             });
 
     }

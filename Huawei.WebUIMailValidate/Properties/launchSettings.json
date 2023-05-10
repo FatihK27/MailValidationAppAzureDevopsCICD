@@ -21,11 +21,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "publishAllPorts": true,
-      "useSSL": false,
-      "environmentVariables": {
-        "ASPNETCORE_URLS": "http://+:80"
-      },
-      "httpPort": 51803
+      "useSSL": false
     }
   },
   "Huawei.WebUIMailValidate": {
