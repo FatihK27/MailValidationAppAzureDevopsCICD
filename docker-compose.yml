@@ -38,6 +38,7 @@ services:
         environment:
              RABBITMQ_DEFAULT_USER: root
              RABBITMQ_DEFAULT_PASS: root
+             TZ: Europe/Istanbul
         volumes:
             - rabbitmq:/var/lib/rabbitmq/
         healthcheck:
@@ -54,6 +55,7 @@ services:
         environment:
             VERIFIER_EMAIL: test@extrakolay.com
             ACCESS_TOKENS: your_token
+            TZ: Europe/Istanbul
         tty: true
         healthcheck:
             test: ["CMD", "curl", "-i", "http://host.docker.internal:9292/healthcheck"]
@@ -71,6 +73,8 @@ services:
             POSTGRES_PASSWORD: Huawei@123!!
             POSTGRES_USER:  root
             PGDATA: /var/lib/postgresql/data/pgdata
+            TZ: Europe/Istanbul
+            PGTZ: Europe/Istanbul
         ports:
             - 5432:5432 
         healthcheck:
@@ -87,6 +91,7 @@ services:
         environment:
             PGADMIN_DEFAULT_EMAIL: youremail@outlook.com
             PGADMIN_DEFAULT_PASSWORD: root
+            TZ: Europe/Istanbul
         volumes:
             - pgadmin-data:/var/lib/pgadmin
 
